@@ -34,8 +34,6 @@ adopted:
         version: v0.1
       - id: task-envelope
         version: v0.1
-      - id: slack-notify
-        version: v0.1
 
     schemas: []
     hooks: []

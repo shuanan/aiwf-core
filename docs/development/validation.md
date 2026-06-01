@@ -1,10 +1,10 @@
 # AIWF Core Validation
 
-This document describes the minimal validation checks for the standalone `aiwf-core` repository.
+This document describes the validation checks for the standalone `aiwf-core` repository.
 
 ## Purpose
 
-The validation script is a lightweight repository health check. It verifies that the initial AIWF Core scaffold remains small, portable, and free of default runtime automation.
+The validation script is a lightweight repository health check. It verifies that the AIWF Core scaffold remains small, portable, internally consistent, and free of default runtime automation.
 
 It does not prove semantic correctness, adoption readiness, or downstream safety.
 
@@ -21,24 +21,30 @@ scripts/validate-aiwf-core.sh
 - `.claude/settings.json` is not present.
 - Runtime hooks are not installed by default.
 - YAML files parse when PyYAML is available.
-- Registry capability `location` paths exist.
-- Approved registry capabilities define non-empty `authority_boundary.can` and `authority_boundary.cannot` lists.
-- Release manifest components resolve to either a registry capability or the kernel component.
-- Registry skill and template paths exist.
+- Capability registry `location` paths exist.
+- Approved capabilities have `authority_boundary.can` and `authority_boundary.cannot`.
+- Release manifest capability IDs exist in the registry.
+- The minimal example adapter remains a safe draft:
+  - `status: draft`
+  - hooks are empty
+  - `worker_policy.default_mode: notify_only`
+  - `worker_policy.auto_paid_worker: false`
+  - forbidden paths include `.env*`, `secrets/**`, and `credentials/**`
+  - adopted capability IDs exist in the registry
+  - adopted kernel rules exist in the kernel
 - Git working tree status is reported.
 
 ## What it does not check
 
 - It does not approve AIWF adoption.
-- It does not validate downstream repo adapters.
+- It does not validate real downstream repo adapters.
+- It does not install hooks.
 - It does not call Claude, Codex, Slack, Linear, Notion, or Langfuse.
-- It does not install hooks, edit settings, or auto-run repository automation.
-- It does not rewrite schemas.
 - It does not prove that any prompt, skill, or schema is correct.
 
 ## Optional dependency
 
-YAML parse validation and internal reference checks use Python `PyYAML` when available.
+YAML parse and internal reference validation use Python `PyYAML` when available.
 
 Install locally only if desired:
 
@@ -46,7 +52,7 @@ Install locally only if desired:
 python3 -m pip install pyyaml
 ```
 
-If PyYAML is not installed, the script skips the YAML parse and internal reference checks and reports them as `SKIP`.
+If PyYAML is not installed, YAML parse and internal reference checks are skipped and reported as `SKIP`.
 
 ## Expected use
 
@@ -56,4 +62,4 @@ Run before committing structural changes:
 bash scripts/validate-aiwf-core.sh
 ```
 
-For the initial repository, the script should pass with no failures.
+CI installs PyYAML, so CI should run the full validation set with no skipped checks.

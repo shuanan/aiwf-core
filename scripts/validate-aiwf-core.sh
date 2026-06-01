@@ -58,6 +58,12 @@ require_file "aiwf/releases/aiwf.v0.1.0.yaml"
 require_file "docs/architecture/architecture.v0.1.md"
 require_file "docs/architecture/kernel.v0.1.md"
 require_file "docs/extraction/extraction_decision.md"
+require_file "docs/quickstart.md"
+require_file "docs/development/validation.md"
+require_file "docs/development/v0.1-foundation-checklist.md"
+require_file "examples/README.md"
+require_file "examples/minimal-repo/README.md"
+require_file "examples/minimal-repo/aiwf.adapter.yaml"
 
 forbid_path ".claude/settings.json"
 forbid_path "archives"
@@ -71,14 +77,21 @@ else
   pass "no runtime hooks installed by default"
 fi
 
-if find . -path './.git' -prune -o -name '*.yaml' -print | grep -q .; then
-  if python3 - <<'PY'
+PYTHON_YAML_AVAILABLE=0
+if python3 - <<'PY'
 try:
     import yaml  # type: ignore
 except Exception:
     raise SystemExit(42)
 PY
-  then
+then
+  PYTHON_YAML_AVAILABLE=1
+else
+  PYTHON_YAML_AVAILABLE=0
+fi
+
+if find . -path './.git' -prune -o -name '*.yaml' -print | grep -q .; then
+  if [[ "$PYTHON_YAML_AVAILABLE" -eq 1 ]]; then
     python3 - <<'PY'
 from pathlib import Path
 import sys
@@ -102,77 +115,121 @@ if bad:
 print("YAML OK")
 PY
     pass "YAML files parse with PyYAML"
+  else
+    skip "PyYAML not installed; YAML parse check not run"
+  fi
+else
+  fail "no YAML files found"
+fi
 
-    python3 - <<'PY'
+if [[ "$PYTHON_YAML_AVAILABLE" -eq 1 ]]; then
+  python3 - <<'PY'
 from pathlib import Path
 import sys
 import yaml  # type: ignore
 
+registry_path = Path("aiwf/registry/aiwf.capabilities.yaml")
+release_path = Path("aiwf/releases/aiwf.v0.1.0.yaml")
+kernel_path = Path("aiwf/kernel/kernel.v0.1.yaml")
+example_adapter_path = Path("examples/minimal-repo/aiwf.adapter.yaml")
 
-def load_yaml(path: str):
-    with Path(path).open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle)
-
-
-registry = load_yaml("aiwf/registry/aiwf.capabilities.yaml")
-kernel = load_yaml("aiwf/kernel/kernel.v0.1.yaml")
-release = load_yaml("aiwf/releases/aiwf.v0.1.0.yaml")
+registry = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+release = yaml.safe_load(release_path.read_text(encoding="utf-8"))
+kernel = yaml.safe_load(kernel_path.read_text(encoding="utf-8"))
+example_adapter = yaml.safe_load(example_adapter_path.read_text(encoding="utf-8"))
 
 errors = []
-capabilities = registry.get("capabilities") or []
-registry_ids = {capability.get("id") for capability in capabilities}
-kernel_components = {("kernel", kernel.get("version"))}
 
-for capability in capabilities:
-    capability_id = capability.get("id", "<missing id>")
-    capability_type = capability.get("type")
-    location = capability.get("location")
+capabilities = registry.get("capabilities", [])
+capability_ids = {cap.get("id") for cap in capabilities}
 
-    if not location:
-        errors.append(f"REGISTRY_LOCATION_MISSING {capability_id}")
-    elif not Path(location).is_file():
-        errors.append(f"REGISTRY_LOCATION_NOT_FOUND {capability_id}: {location}")
+for cap in capabilities:
+    cap_id = cap.get("id", "<missing-id>")
+    location = cap.get("location")
+    if location and not Path(location).exists():
+        errors.append(f"capability {cap_id} location does not exist: {location}")
+    if cap.get("status") == "approved":
+        boundary = cap.get("authority_boundary") or {}
+        if not boundary.get("can"):
+            errors.append(f"approved capability {cap_id} missing authority_boundary.can")
+        if not boundary.get("cannot"):
+            errors.append(f"approved capability {cap_id} missing authority_boundary.cannot")
 
-    if capability.get("status") == "approved":
-        boundary = capability.get("authority_boundary") or {}
-        for key in ("can", "cannot"):
-            value = boundary.get(key)
-            if not isinstance(value, list) or not value:
-                errors.append(f"APPROVED_AUTHORITY_BOUNDARY_MISSING {capability_id}: authority_boundary.{key}")
+for cap in release.get("components", {}).get("capabilities", []):
+    cap_id = cap.get("id")
+    if cap_id not in capability_ids:
+        errors.append(f"release component not found in registry: {cap_id}")
 
-    if capability_type in {"skill", "template"}:
-        if not location or not Path(location).is_file():
-            errors.append(f"REGISTRY_{capability_type.upper()}_PATH_NOT_FOUND {capability_id}: {location}")
+kernel_rule_ids = {key for key in kernel.keys() if key.startswith("K")}
 
-release_components = release.get("components") or {}
-for component_group, items in release_components.items():
-    if not isinstance(items, list):
-        errors.append(f"RELEASE_COMPONENT_GROUP_INVALID {component_group}")
-        continue
+if example_adapter.get("status") != "draft":
+    errors.append("example adapter status must be draft")
 
-    for item in items:
-        component_id = item.get("id") if isinstance(item, dict) else None
-        component_version = item.get("version") if isinstance(item, dict) else None
-        if component_id in registry_ids:
-            continue
-        if (component_id, component_version) in kernel_components:
-            continue
-        errors.append(f"RELEASE_COMPONENT_UNRESOLVED {component_group}: {component_id}@{component_version}")
+adapter_hooks = (
+    example_adapter
+    .get("adopted", {})
+    .get("capabilities", {})
+    .get("hooks", [])
+)
+if adapter_hooks != []:
+    errors.append("example adapter hooks must be empty")
+
+worker_policy = example_adapter.get("worker_policy", {})
+if worker_policy.get("default_mode") != "notify_only":
+    errors.append("example adapter worker_policy.default_mode must be notify_only")
+if worker_policy.get("auto_paid_worker") is not False:
+    errors.append("example adapter worker_policy.auto_paid_worker must be false")
+
+for required_forbidden_path in [".env*", "secrets/**", "credentials/**"]:
+    forbidden_paths = example_adapter.get("local_boundary", {}).get("forbidden_paths", [])
+    if required_forbidden_path not in forbidden_paths:
+        errors.append(f"example adapter forbidden_paths missing {required_forbidden_path}")
+
+adapter_skill_ids = [
+    item.get("id")
+    for item in (
+        example_adapter
+        .get("adopted", {})
+        .get("capabilities", {})
+        .get("skills", [])
+    )
+]
+adapter_template_ids = [
+    item.get("id")
+    for item in (
+        example_adapter
+        .get("adopted", {})
+        .get("capabilities", {})
+        .get("templates", [])
+    )
+]
+for cap_id in adapter_skill_ids + adapter_template_ids:
+    if cap_id not in capability_ids:
+        errors.append(f"example adapter adopted capability not found in registry: {cap_id}")
+
+adapter_kernel_rules = (
+    example_adapter
+    .get("adopted", {})
+    .get("kernel", {})
+    .get("rules", [])
+)
+for rule_id in adapter_kernel_rules:
+    if rule_id not in kernel_rule_ids:
+        errors.append(f"example adapter kernel rule not found in kernel: {rule_id}")
 
 if errors:
     for error in errors:
-        print(error, file=sys.stderr)
+        print(f"INTERNAL_REFERENCE_FAIL {error}", file=sys.stderr)
     raise SystemExit(1)
 
 print("INTERNAL_REFERENCES OK")
+print("EXAMPLE_ADAPTER OK")
 PY
-    pass "internal references are consistent"
-  else
-    skip "PyYAML not installed; YAML parse check not run"
-    skip "PyYAML not installed; internal reference checks not run"
-  fi
+  pass "internal registry/release references are consistent"
+  pass "example adapter structure is safe draft"
 else
-  fail "no YAML files found"
+  skip "PyYAML not installed; internal reference checks not run"
+  skip "PyYAML not installed; example adapter checks not run"
 fi
 
 if git status --short | grep -q .; then
