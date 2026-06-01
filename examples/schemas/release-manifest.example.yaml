@@ -1,0 +1,45 @@
+# Example only — does not imply adoption. See docs/development/schema-examples.md
+version: v0.1.0
+release_ref: aiwf@example-v0.1.0
+date: 2026-06-01
+status: draft
+
+components:
+  kernel:
+    - id: kernel
+      version: v0.1
+
+  capabilities:
+    - id: source-check
+      type: skill
+      version: v0.1
+    - id: hallucination-check
+      type: skill
+      version: v0.1
+    - id: write-preview
+      type: template
+      version: v0.1
+    - id: task-envelope
+      type: template
+      version: v0.1
+    - id: aiwf.adapter
+      type: schema
+      version: v0.1
+    - id: aiwf.worker_profiles
+      type: schema
+      version: v0.1
+    - id: aiwf.release_manifest
+      type: schema
+      version: v0.1
+
+changelog:
+  added:
+    - example kernel component entry
+    - example skill and template component entries
+    - example schema component entries
+  changed: []
+  deprecated: []
+  removed: []
+  migration_notes:
+    - This fictional release manifest demonstrates structure only.
+    - Downstream adoption still requires a separate approved adapter.
