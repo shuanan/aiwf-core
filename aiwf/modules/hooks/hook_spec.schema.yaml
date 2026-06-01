@@ -1,0 +1,22 @@
+version: v0.1
+schema: aiwf.hook_spec
+
+required_fields:
+  - id
+  - version
+  - status
+  - purpose
+  - scope
+  - behavior
+  - safety
+  - fixtures
+  - install_preview
+  - validation
+  - approval
+
+rules:
+  - hooks_are_optional_enforcement
+  - default_not_installed
+  - initial_downstream_max_H1_or_H2
+  - H3_blocking_requires_explicit_approval
+  - hook_cannot_prove_semantic_truth

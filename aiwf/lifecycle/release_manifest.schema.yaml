@@ -1,0 +1,13 @@
+version: v0.1
+schema: aiwf.release_manifest
+
+required_fields:
+  - version
+  - release_ref
+  - date
+  - components
+  - changelog
+
+rules:
+  - release_does_not_mean_downstream_adoption
+  - only_released_components_may_enter_registry_as_approved

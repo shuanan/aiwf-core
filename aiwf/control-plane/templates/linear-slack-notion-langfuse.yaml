@@ -1,0 +1,39 @@
+version: v0.1
+mode: external_board_adapter
+
+systems:
+  linear:
+    role: canonical_board
+    owns: [issue_status, dependencies, priority, assignee, worker_mode_field, review_gate_field]
+
+  slack:
+    role: notification_and_human_command
+    owns: [ready_notification, run_request, stop_request, paid_run_approval, review_alert, blocked_alert]
+
+  notion:
+    role: specs_and_decisions
+    owns: [PRD, architecture_notes, design_snapshots, adoption_decisions, lifecycle_records]
+
+  langfuse:
+    role: observability
+    owns: [run_trace, worker_used, token_usage_if_available, cost_if_available, outcome_quality]
+
+linear_state_machine:
+  Backlog:
+    agent_action: none
+  Ready:
+    agent_action: [generate_or_update_TaskEnvelope, select_worker_mode, notify_slack]
+  Human_Launch:
+    agent_action: [wait_for_human_manual_launch, no_auto_paid_worker]
+  Agent_Running:
+    agent_action: [monitor_only, log_trace_id_if_provided]
+  PR_Ready:
+    entry_conditions: [PR_exists, CI_passed_or_not_checked_with_reason, no_merge_conflict, diff_summary_exists]
+    agent_action: [notify_human_review]
+  Human_Review:
+    agent_action: [wait_for_human_decision]
+  Done:
+    entry_conditions: [human_merged_or_marked_done]
+    agent_action: [unblock_dependent_issues]
+  Blocked:
+    agent_action: [notify_slack_with_blocker]

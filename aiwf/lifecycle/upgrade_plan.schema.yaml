@@ -1,0 +1,19 @@
+version: v0.1
+schema: aiwf.upgrade_plan
+
+required_fields:
+  - target_repo
+  - current_source_ref
+  - target_source_ref
+  - adopted_components_changed
+  - ignored_changes
+  - risk
+  - proposed_adapter_patch
+  - verification
+  - rollback
+  - approval_required
+
+rules:
+  - compare_adopted_components_only
+  - do_not_apply_automatically
+  - breaking_changes_require_explicit_approval

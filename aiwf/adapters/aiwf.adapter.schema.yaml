@@ -1,0 +1,25 @@
+version: v0.1
+schema: aiwf.adapter
+
+required_fields:
+  - version
+  - target_repo
+  - status
+  - source
+  - adopted
+  - local_boundary
+  - forbidden_actions
+  - write_gate
+  - verification
+  - rollback
+
+status_values:
+  - draft
+  - approved
+  - deprecated
+
+rules:
+  - only_approved_adapter_is_active
+  - unlisted_capability_is_not_adopted
+  - local_repo_boundary_wins
+  - adapter_record_is_not_approval_by_itself

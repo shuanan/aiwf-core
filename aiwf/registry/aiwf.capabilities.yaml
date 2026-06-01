@@ -1,0 +1,89 @@
+version: v0.1
+role: approved_capability_catalog
+selection_rule: smallest_approved_adopted_capability_set
+
+statuses:
+  selectable: [approved]
+  not_selectable: [idea, candidate, reviewed, pilot_only, deprecated, superseded]
+
+types: [skill, template, schema, hook, sop]
+
+capabilities:
+  - id: source-check
+    type: skill
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [review, compare, shape]
+      signals: [factual_claim, stale_info, source_needed, adoption_critical_claim]
+    location: aiwf/modules/skills/source-check/SKILL.md
+    authority_boundary:
+      can: [verify_claims, label_unknowns, request_sources]
+      cannot: [approve, install, merge, promote]
+    risk: low
+
+  - id: hallucination-check
+    type: skill
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [review, shape]
+      signals: [unsupported_claims, fake_certainty, missing_sources]
+    location: aiwf/modules/skills/hallucination-check/SKILL.md
+    authority_boundary:
+      can: [flag_unsupported_claims, separate_fact_inference_unknown]
+      cannot: [approve, install, merge, promote]
+    risk: low
+
+  - id: write-preview
+    type: template
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [write]
+      signals: [persistent_write, external_state_change]
+    location: aiwf/modules/templates/write-preview.md
+    authority_boundary:
+      can: [structure_preview]
+      cannot: [grant_approval]
+    risk: low
+
+  - id: task-envelope
+    type: template
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [write, transform]
+      signals: [handoff_to_executor, bounded_task_needed]
+    location: aiwf/modules/templates/task-envelope.md
+    authority_boundary:
+      can: [define_scope, define_done_when, define_stop_conditions]
+      cannot: [override_hard_stops, approve_execution]
+    risk: low
+
+  - id: hook-candidate-generator
+    type: skill
+    status: approved
+    version: v0.1
+    invocation: manual_only
+    trigger:
+      task_classes: [shape, review]
+      signals: [repeated_violation, hook_gap, protected_path_issue]
+    location: aiwf/modules/skills/hook-candidate-generator/SKILL.md
+    authority_boundary:
+      can: [draft_hook_spec, draft_fixtures, draft_install_preview]
+      cannot: [install_hook, edit_settings, promote_blocking]
+    risk: medium
+
+  - id: downstream-adapter
+    type: template
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [shape, write]
+      signals: [adopt_aiwf_into_repo, repo_boundary_needed]
+    location: aiwf/modules/templates/downstream-adapter.md
+    authority_boundary:
+      can: [draft_adapter]
+      cannot: [mark_adopted_without_approval]
+    risk: medium

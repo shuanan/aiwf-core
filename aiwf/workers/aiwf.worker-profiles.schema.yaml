@@ -1,0 +1,20 @@
+version: v0.1
+schema: aiwf.worker_profiles
+
+required_fields:
+  - version
+  - defaults
+  - profiles
+
+profile_required_fields:
+  - id
+  - role
+  - workers
+  - cost_policy
+  - fallback
+
+rules:
+  - worker_access_is_per_user_or_role
+  - no_entitlement_means_no_auto_run
+  - extra_paid_usage_requires_explicit_per_run_approval
+  - fallback_is_slack_notify

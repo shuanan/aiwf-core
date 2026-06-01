@@ -1,0 +1,25 @@
+version: v0.1
+schema: aiwf.capabilities
+required_fields:
+  - version
+  - role
+  - selection_rule
+  - statuses
+  - types
+  - capabilities
+
+capability_required_fields:
+  - id
+  - type
+  - status
+  - version
+  - trigger
+  - location
+  - authority_boundary
+  - risk
+
+selection_constraints:
+  - status_must_equal_approved
+  - capability_must_be_adopted_by_adapter
+  - trigger_must_match_task
+  - choose_smallest_sufficient_set

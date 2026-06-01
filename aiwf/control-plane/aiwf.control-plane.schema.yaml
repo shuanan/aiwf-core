@@ -1,0 +1,28 @@
+version: v0.1
+schema: aiwf.control_plane
+
+systems:
+  linear:
+    role: canonical_board
+  slack:
+    role: notification_and_human_command
+  notion:
+    role: specs_and_decisions
+  langfuse:
+    role: observability
+
+state_machine:
+  - Backlog
+  - Ready
+  - Human_Launch
+  - Agent_Running
+  - PR_Ready
+  - Human_Review
+  - Done
+  - Blocked
+
+rules:
+  - do_not_build_custom_kanban_ui_v0
+  - no_auto_paid_worker_in_mvp
+  - done_requires_human_merge_or_mark_done
+  - unblock_dependencies_only_after_human_done
