@@ -102,8 +102,74 @@ if bad:
 print("YAML OK")
 PY
     pass "YAML files parse with PyYAML"
+
+    python3 - <<'PY'
+from pathlib import Path
+import sys
+import yaml  # type: ignore
+
+
+def load_yaml(path: str):
+    with Path(path).open("r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
+
+
+registry = load_yaml("aiwf/registry/aiwf.capabilities.yaml")
+kernel = load_yaml("aiwf/kernel/kernel.v0.1.yaml")
+release = load_yaml("aiwf/releases/aiwf.v0.1.0.yaml")
+
+errors = []
+capabilities = registry.get("capabilities") or []
+registry_ids = {capability.get("id") for capability in capabilities}
+kernel_components = {("kernel", kernel.get("version"))}
+
+for capability in capabilities:
+    capability_id = capability.get("id", "<missing id>")
+    capability_type = capability.get("type")
+    location = capability.get("location")
+
+    if not location:
+        errors.append(f"REGISTRY_LOCATION_MISSING {capability_id}")
+    elif not Path(location).is_file():
+        errors.append(f"REGISTRY_LOCATION_NOT_FOUND {capability_id}: {location}")
+
+    if capability.get("status") == "approved":
+        boundary = capability.get("authority_boundary") or {}
+        for key in ("can", "cannot"):
+            value = boundary.get(key)
+            if not isinstance(value, list) or not value:
+                errors.append(f"APPROVED_AUTHORITY_BOUNDARY_MISSING {capability_id}: authority_boundary.{key}")
+
+    if capability_type in {"skill", "template"}:
+        if not location or not Path(location).is_file():
+            errors.append(f"REGISTRY_{capability_type.upper()}_PATH_NOT_FOUND {capability_id}: {location}")
+
+release_components = release.get("components") or {}
+for component_group, items in release_components.items():
+    if not isinstance(items, list):
+        errors.append(f"RELEASE_COMPONENT_GROUP_INVALID {component_group}")
+        continue
+
+    for item in items:
+        component_id = item.get("id") if isinstance(item, dict) else None
+        component_version = item.get("version") if isinstance(item, dict) else None
+        if component_id in registry_ids:
+            continue
+        if (component_id, component_version) in kernel_components:
+            continue
+        errors.append(f"RELEASE_COMPONENT_UNRESOLVED {component_group}: {component_id}@{component_version}")
+
+if errors:
+    for error in errors:
+        print(error, file=sys.stderr)
+    raise SystemExit(1)
+
+print("INTERNAL_REFERENCES OK")
+PY
+    pass "internal references are consistent"
   else
     skip "PyYAML not installed; YAML parse check not run"
+    skip "PyYAML not installed; internal reference checks not run"
   fi
 else
   fail "no YAML files found"
