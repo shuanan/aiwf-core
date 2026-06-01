@@ -61,6 +61,19 @@ capabilities:
       cannot: [override_hard_stops, approve_execution]
     risk: low
 
+  - id: slack-notify
+    type: template
+    status: approved
+    version: v0.1
+    trigger:
+      task_classes: [review, write, shape]
+      signals: [notify_human, manual_handoff, no_eligible_worker, review_alert]
+    location: aiwf/modules/templates/slack-notify.md
+    authority_boundary:
+      can: [format_notification, summarize_next_steps, describe_manual_handoff]
+      cannot: [send_slack_message, call_slack_api, approve, merge, mark_done]
+    risk: low
+
   - id: hook-candidate-generator
     type: skill
     status: approved

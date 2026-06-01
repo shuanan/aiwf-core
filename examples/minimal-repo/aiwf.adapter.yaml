@@ -34,6 +34,8 @@ adopted:
         version: v0.1
       - id: task-envelope
         version: v0.1
+      - id: slack-notify
+        version: v0.1
 
     schemas: []
     hooks: []
@@ -110,3 +112,4 @@ notes:
   - Hooks are not adopted.
   - Worker auto-run is not enabled.
   - Paid worker execution is not enabled.
+  - slack-notify is a passive template only; it does not call Slack.

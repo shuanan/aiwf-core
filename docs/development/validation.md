@@ -32,7 +32,27 @@ scripts/validate-aiwf-core.sh
   - forbidden paths include `.env*`, `secrets/**`, and `credentials/**`
   - adopted capability IDs exist in the registry
   - adopted kernel rules exist in the kernel
+- Declaration mismatches include remediation guidance instead of silently choosing intent.
 - Git working tree status is reported.
+
+## Declaration Integrity Gate
+
+The validator checks declaration integrity across three surfaces:
+
+- Artifact: a file exists.
+- Registry: the library exposes a selectable capability.
+- Adapter: a repo or example claims adoption.
+
+Valid adoption requires all of these to align:
+
+- Artifact exists.
+- Registry entry exists.
+- Registry status is `approved`.
+- Adapter adopts it.
+
+When the validator finds a mismatch, it must report the mismatch and remediation options. It must not silently register, remove, promote, downgrade, or adopt anything.
+
+See `docs/development/declaration-integrity-gate.md`.
 
 ## What it does not check
 
