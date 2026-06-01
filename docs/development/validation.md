@@ -54,6 +54,18 @@ When the validator finds a mismatch, it must report the mismatch and remediation
 
 See `docs/development/declaration-integrity-gate.md`.
 
+## Skill vs CI boundary
+
+`repo-validation-check` may help an agent run local validation before handoff.
+
+It is not a replacement for CI.
+
+- Skill checks before handoff.
+- CI verifies after push.
+- Local validation is useful preflight evidence.
+- GitHub Actions remains the final repository receipt.
+- A skill must not claim CI passed before CI actually runs.
+
 ## What it does not check
 
 - It does not approve AIWF adoption.

@@ -74,6 +74,19 @@ capabilities:
       cannot: [send_slack_message, call_slack_api, approve, merge, mark_done]
     risk: low
 
+  - id: repo-validation-check
+    type: skill
+    status: candidate
+    version: v0.1
+    trigger:
+      task_classes: [review, write, transform]
+      signals: [before_handoff, validation_needed, repo_health_check, done_claim]
+    location: aiwf/modules/skills/repo-validation-check/SKILL.md
+    authority_boundary:
+      can: [run_local_validation, interpret_validation_output, report_pass_fail_skip, remind_ci_required]
+      cannot: [approve, install_hook, edit_settings, merge, mark_done, claim_ci_passed_before_ci_runs]
+    risk: medium
+
   - id: hook-candidate-generator
     type: skill
     status: approved
