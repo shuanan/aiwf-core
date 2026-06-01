@@ -10,6 +10,14 @@ Skill checks before handoff; CI verifies after push.
 
 This document records observed runs. It is evidence for deciding whether the candidate skill is useful, not approval for promotion.
 
+Machine-readable dogfood run records live in:
+
+```text
+docs/development/dogfood-runs/
+```
+
+Those YAML records are checked by the Dogfood Evidence Gate in `scripts/validate-aiwf-core.sh`.
+
 ## Runs
 
 ```yaml

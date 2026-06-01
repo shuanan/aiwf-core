@@ -1,0 +1,54 @@
+version: v0.1
+schema: aiwf.dogfood_run
+
+required_fields:
+  - skill_id
+  - run_id
+  - date
+  - commit
+  - task
+  - local_validation
+  - ci
+  - boundary
+  - human_observation
+
+local_validation_required_fields:
+  - ran_before_commit
+  - passed
+  - failed
+  - skipped
+
+ci_required_fields:
+  - verified_after_push
+  - run_id
+  - result
+  - passed
+  - failed
+  - skipped
+
+boundary_required_fields:
+  - no_false_ci_claim
+  - no_adoption_approval_claim
+  - no_hooks_or_settings
+  - no_external_services
+  - no_auto_fix
+  - no_auto_merge
+
+human_observation_required_fields:
+  - reduced_missed_steps
+  - clarified_ci_boundary
+  - caused_false_authority
+
+rules:
+  - local_validation.ran_before_commit must be true
+  - local_validation.failed must be 0
+  - local_validation.skipped must be 0
+  - ci.verified_after_push must be true
+  - ci.result must be success
+  - ci.failed must be 0
+  - ci.skipped must be 0
+  - all boundary fields must be true
+  - human_observation.caused_false_authority must be no
+  - validator may count valid runs
+  - validator must not promote skills
+  - promotion decision requires explicit human approval

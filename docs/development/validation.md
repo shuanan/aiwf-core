@@ -66,6 +66,20 @@ It is not a replacement for CI.
 - GitHub Actions remains the final repository receipt.
 - A skill must not claim CI passed before CI actually runs.
 
+## Dogfood Evidence Gate
+
+Dogfood run records live under:
+
+```text
+docs/development/dogfood-runs/*.yaml
+```
+
+CI validates that records are complete, have zero failed/skipped checks, preserve boundary flags, and record CI verification after push.
+
+The gate may count valid runs per candidate skill.
+
+The gate must not promote a skill. Promotion remains a human decision.
+
 ## What it does not check
 
 - It does not approve AIWF adoption.

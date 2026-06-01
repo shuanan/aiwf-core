@@ -1,0 +1,38 @@
+skill_id: repo-validation-check
+run_id: "001"
+date: 2026-06-01
+commit: 7b31202
+task: "docs: record repo validation dogfood runs"
+
+local_validation:
+  ran_before_commit: true
+  passed: 35
+  failed: 0
+  skipped: 0
+
+ci:
+  verified_after_push: true
+  run_id: 26738219232
+  result: success
+  passed: 35
+  failed: 0
+  skipped: 0
+
+boundary:
+  no_false_ci_claim: true
+  no_adoption_approval_claim: true
+  no_hooks_or_settings: true
+  no_external_services: true
+  no_auto_fix: true
+  no_auto_merge: true
+
+human_observation:
+  reduced_missed_steps: unknown
+  clarified_ci_boundary: yes
+  caused_false_authority: no
+
+notes:
+  - Dogfood run #1 used the repo-validation-check candidate workflow boundary.
+  - Local validation was verified before commit.
+  - CI was verified after push.
+  - This record is evidence only and does not promote the skill.

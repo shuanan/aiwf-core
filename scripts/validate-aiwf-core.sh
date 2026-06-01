@@ -54,6 +54,7 @@ require_file "aiwf/control-plane/aiwf.control-plane.schema.yaml"
 require_file "aiwf/control-plane/templates/linear-slack-notion-langfuse.yaml"
 require_file "aiwf/lifecycle/release_manifest.schema.yaml"
 require_file "aiwf/lifecycle/upgrade_plan.schema.yaml"
+require_file "aiwf/lifecycle/dogfood_run.schema.yaml"
 require_file "aiwf/releases/aiwf.v0.1.0.yaml"
 require_file "docs/architecture/architecture.v0.1.md"
 require_file "docs/architecture/kernel.v0.1.md"
@@ -290,6 +291,96 @@ else
   skip "PyYAML not installed; internal reference checks not run"
   skip "PyYAML not installed; example adapter checks not run"
   skip "PyYAML not installed; declaration integrity checks not run"
+fi
+
+if [[ "$PYTHON_YAML_AVAILABLE" -eq 1 ]]; then
+  python3 - <<'PY'
+from collections import Counter
+from pathlib import Path
+import sys
+import yaml  # type: ignore
+
+schema_path = Path("aiwf/lifecycle/dogfood_run.schema.yaml")
+records_dir = Path("docs/development/dogfood-runs")
+
+schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+record_paths = sorted(records_dir.glob("*.yaml"))
+errors = []
+valid_runs = Counter()
+
+
+def require_mapping(value, label):
+    if not isinstance(value, dict):
+        errors.append(f"DOGFOOD_EVIDENCE_FAIL {label} must be a mapping")
+        return {}
+    return value
+
+
+def require_fields(mapping, fields, label):
+    for field in fields:
+        if field not in mapping or mapping[field] in (None, ""):
+            errors.append(f"DOGFOOD_EVIDENCE_FAIL {label} missing required field: {field}")
+
+
+def expect(value, expected, label):
+    if value != expected:
+        errors.append(f"DOGFOOD_EVIDENCE_FAIL {label} expected {expected!r}, got {value!r}")
+
+
+if not record_paths:
+    errors.append("DOGFOOD_EVIDENCE_FAIL no dogfood run records found")
+
+for path in record_paths:
+    record = require_mapping(yaml.safe_load(path.read_text(encoding="utf-8")), str(path))
+    require_fields(record, schema.get("required_fields", []), str(path))
+
+    skill_id = record.get("skill_id")
+    local_validation = require_mapping(record.get("local_validation"), f"{path}: local_validation")
+    ci = require_mapping(record.get("ci"), f"{path}: ci")
+    boundary = require_mapping(record.get("boundary"), f"{path}: boundary")
+    human_observation = require_mapping(record.get("human_observation"), f"{path}: human_observation")
+
+    require_fields(local_validation, schema.get("local_validation_required_fields", []), f"{path}: local_validation")
+    require_fields(ci, schema.get("ci_required_fields", []), f"{path}: ci")
+    require_fields(boundary, schema.get("boundary_required_fields", []), f"{path}: boundary")
+    require_fields(human_observation, schema.get("human_observation_required_fields", []), f"{path}: human_observation")
+
+    expect(local_validation.get("ran_before_commit"), True, f"{path}: local_validation.ran_before_commit")
+    expect(local_validation.get("failed"), 0, f"{path}: local_validation.failed")
+    expect(local_validation.get("skipped"), 0, f"{path}: local_validation.skipped")
+    expect(ci.get("verified_after_push"), True, f"{path}: ci.verified_after_push")
+    expect(ci.get("result"), "success", f"{path}: ci.result")
+    expect(ci.get("failed"), 0, f"{path}: ci.failed")
+    expect(ci.get("skipped"), 0, f"{path}: ci.skipped")
+
+    for field in schema.get("boundary_required_fields", []):
+        expect(boundary.get(field), True, f"{path}: boundary.{field}")
+
+    caused_false_authority = human_observation.get("caused_false_authority")
+    if caused_false_authority not in ("no", False):
+        errors.append(
+            "DOGFOOD_EVIDENCE_FAIL "
+            f"{path}: human_observation.caused_false_authority expected 'no', got {caused_false_authority!r}"
+        )
+
+    if not errors:
+        valid_runs[skill_id] += 1
+
+if errors:
+    for error in errors:
+        print(error, file=sys.stderr)
+    print(
+        "DOGFOOD_EVIDENCE_FAIL evidence gate cannot promote skills; human decision required",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+
+for skill_id, count in sorted(valid_runs.items()):
+    print(f"DOGFOOD_EVIDENCE OK {skill_id} valid_runs={count}")
+PY
+  pass "dogfood evidence records are complete"
+else
+  skip "PyYAML not installed; dogfood evidence checks not run"
 fi
 
 if git status --short | grep -q .; then

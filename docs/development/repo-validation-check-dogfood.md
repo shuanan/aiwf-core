@@ -46,7 +46,15 @@ Avoid using this protocol as justification for:
 
 ## Required observations
 
-For each dogfood run, record:
+For each dogfood run, record a machine-readable YAML file under:
+
+```text
+docs/development/dogfood-runs/
+```
+
+Each record must pass the Dogfood Evidence Gate in `scripts/validate-aiwf-core.sh`.
+
+Use this shape:
 
 ```yaml
 dogfood_run:
