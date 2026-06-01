@@ -48,8 +48,9 @@ docs/
 
 ## Start here
 
-1. Read `docs/architecture/architecture.v0.1.md`.
-2. Read `aiwf/kernel/kernel.v0.1.yaml`.
-3. Use `aiwf/adapters/templates/aiwf.adapter.yaml` to draft a repo-local adapter.
-4. Use `aiwf/workers/templates/worker-profiles.yaml` to define worker access.
-5. Do not install hooks or automation until explicitly approved.
+1. Read `docs/quickstart.md`.
+2. Read `docs/architecture/architecture.v0.1.md`.
+3. Read `aiwf/kernel/kernel.v0.1.yaml`.
+4. Use `aiwf/adapters/templates/aiwf.adapter.yaml` to draft a repo-local adapter.
+5. Keep adoption notify/manual by default; do not install hooks, change settings, or run automation until explicitly approved.
+6. Run `scripts/validate-aiwf-core.sh` before committing structural changes.
