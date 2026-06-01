@@ -15,8 +15,34 @@ required_fields:
 
 status_values:
   - draft
+  - evaluated
   - approved
   - deprecated
+
+evaluation:
+  description: "Optional. Records when and how the adapter was evaluated against repo source."
+  required: false
+  fields:
+    status:
+      type: string
+      enum: [not_evaluated, evaluated]
+      description: "Whether the adapter has been evaluated against repo source"
+    last_evaluated:
+      type: string
+      format: date
+      description: "Date of last evaluation (YYYY-MM-DD)"
+    evaluated_against:
+      type: list
+      items: string
+      description: "Source documents evaluated against (e.g. CLAUDE.md, AGENTS.md, repo file structure)"
+    known_gaps:
+      type: list
+      items: string
+      description: "Known gaps found during evaluation"
+    re_evaluate_when:
+      type: list
+      items: string
+      description: "Triggers for re-evaluation"
 
 rules:
   - only_approved_adapter_is_active

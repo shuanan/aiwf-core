@@ -326,6 +326,22 @@ The draft adapter is a starting point for that conversation, not a completion of
 
 ---
 
+## Re-evaluation
+
+Your adapter can drift from reality over time. Re-evaluate when:
+
+- CLAUDE.md, AGENTS.md, or equivalent governance docs change significantly
+- Deploy method, database, or infrastructure changes
+- New governance practices are added that the adapter doesn't capture
+- At minimum every 3 months
+
+Re-evaluation means: re-read the adapter, compare against current repo
+state, update the `evaluation` section, and document any new gaps.
+Status goes from `draft` → `evaluated` after the first successful
+evaluation. It does not mean `adopted` — that is a separate human decision.
+
+---
+
 ## Real-world example
 
 The `shuanan/news-api` pilot adapter (committed as `aiwf.adapter.yaml` in the repo root on 2026-06-01) is a concrete example of what a completed draft looks like for a production service.

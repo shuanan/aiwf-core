@@ -97,6 +97,23 @@ verification:
 rollback:
   default: git revert
 
+# Example only — evaluation section shows the pattern after human review
+evaluation:
+  status: evaluated
+  last_evaluated: "2026-06-01"
+  evaluated_against:
+    - CLAUDE.md
+    - AGENTS.md
+    - "repo file structure"
+  known_gaps:
+    - "example gap: local deploy method not declared in adapter"
+    - "example gap: cross-repo consumers not listed"
+  re_evaluate_when:
+    - "CLAUDE.md or AGENTS.md changes significantly"
+    - "deploy method, DB, or infrastructure changes"
+    - "new governance practices added"
+    - "3 months since last evaluation"
+
 notes:
   - This example adapter is a draft and is not active adoption.
   - Hooks are not adopted.
