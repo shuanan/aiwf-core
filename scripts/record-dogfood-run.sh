@@ -260,7 +260,7 @@ skill_id: ${SKILL_ID}
 run_id: "${NEXT_NUM}"
 date: ${DATE}
 commit: ${COMMIT}
-task: ${TASK}
+task: "${TASK}"
 
 local_validation:
   ran_before_commit: true
