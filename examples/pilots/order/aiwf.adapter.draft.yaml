@@ -1,0 +1,94 @@
+# External pilot draft — does not imply Order has adopted AIWF.
+# Order repo does not commit AIWF files.
+# This file exists only in aiwf-core as pilot evidence.
+version: v0.1
+target_repo: internal/Order
+status: draft
+
+source:
+  aiwf_repo: shuanan/aiwf-core
+  source_ref: aiwf@v0.1.0
+  adopted_at: 2026-06-02
+  last_reviewed_at: 2026-06-02
+
+adopted:
+  kernel:
+    version: v0.1
+    rules:
+      - K1_no_self_approval
+      - K2_source_boundary
+      - K3_task_boundary
+      - K4_epistemic_boundary
+      - K5_write_boundary
+      - K6_local_boundary_wins
+      - K7_load_on_demand
+
+  capabilities:
+    skills:
+      - id: source-check
+        version: v0.1
+        invocation: manual_or_on_demand
+    templates:
+      - id: write-preview
+        version: v0.1
+      - id: task-envelope
+        version: v0.1
+    schemas: []
+    hooks: []
+    sops: []
+
+local_boundary:
+  allowed_paths:
+    - .ai/docs/**
+    - Admin/**
+    - Pages/**
+    - App_Code/**
+  protected_paths:
+    - .ai/graphify/**
+    - .claude/**
+    - "*.sln"
+    - "*.csproj"
+    - "*.pubxml"
+  forbidden_paths:
+    - Web.config
+    - .env*
+    - secrets/**
+    - credentials/**
+    - db/**
+
+forbidden_actions:
+  - auto_merge
+  - deployment_without_approval
+  - production_automation
+  - silent_hook_install
+  - silent_skill_install
+  - settings_change_without_approval
+  - reading_secrets
+  - direct_db_modification
+  - iis_config_change
+
+write_gate:
+  persistent_writes_require_preview: true
+  preview_required_fields:
+    - target
+    - operation
+    - risk
+    - reversibility
+    - verification
+    - rollback
+  approval:
+    required: true
+    accepted_phrases:
+      - approved
+      - go
+
+verification:
+  default_commands:
+    - git status --short
+  if_unavailable: state_not_checked_with_reason
+  notes: >
+    No CI, no test runner. Verification is manual:
+    Visual Studio build (F6) + browser test at https://jtitest.tw.
+
+rollback:
+  default: git revert
