@@ -21,6 +21,17 @@ capabilities:
       can: [verify_claims, label_unknowns, request_sources]
       cannot: [approve, install, merge, promote]
     risk: low
+    health:
+      checks:
+        - "Factual or adoption-critical claims are verified against cited sources before recommendations are finalized."
+        - "Unknown or stale claims are labeled instead of presented as confirmed."
+      re_evaluate_when:
+        - "The source-check skill instructions change materially."
+        - "Review work shows repeated missed stale or unsupported claims."
+      demotion_criteria:
+        - "The skill routinely accepts unsupported claims as verified."
+        - "It blocks progress with source requests that are not relevant to the task."
+      last_reviewed: "2026-06-02"
 
   - id: hallucination-check
     type: skill
@@ -34,6 +45,17 @@ capabilities:
       can: [flag_unsupported_claims, separate_fact_inference_unknown]
       cannot: [approve, install, merge, promote]
     risk: low
+    health:
+      checks:
+        - "Unsupported claims are flagged with fact, inference, or unknown distinctions."
+        - "Findings include enough context for a human to confirm the concern."
+      re_evaluate_when:
+        - "Tasks using the skill repeatedly miss fabricated citations or invented facts."
+        - "The hallucination-check prompt or output format changes materially."
+      demotion_criteria:
+        - "The skill repeatedly marks unsupported claims as acceptable."
+        - "Reports become too vague for a reviewer to act on."
+      last_reviewed: "2026-06-02"
 
   - id: write-preview
     type: template
@@ -47,6 +69,17 @@ capabilities:
       can: [structure_preview]
       cannot: [grant_approval]
     risk: low
+    health:
+      checks:
+        - "Preview output clearly separates proposed writes from approved execution."
+        - "Persistent or external state changes include visible scope before any write proceeds."
+      re_evaluate_when:
+        - "Write workflows add new external systems or persistent destinations."
+        - "Users report confusion between preview and execution states."
+      demotion_criteria:
+        - "The template fails to show what will be written before execution."
+        - "It implies approval has been granted when only a preview was requested."
+      last_reviewed: "2026-06-02"
 
   - id: task-envelope
     type: template
@@ -60,6 +93,17 @@ capabilities:
       can: [define_scope, define_done_when, define_stop_conditions]
       cannot: [override_hard_stops, approve_execution]
     risk: low
+    health:
+      checks:
+        - "Generated envelopes state scope, done conditions, and stop conditions."
+        - "Executor handoffs preserve explicit boundaries from the originating task."
+      re_evaluate_when:
+        - "New executor handoff patterns require additional boundary details."
+        - "Task envelopes repeatedly omit stop conditions or completion criteria."
+      demotion_criteria:
+        - "The template allows execution beyond the originating task scope."
+        - "It fails to preserve hard stops during handoff."
+      last_reviewed: "2026-06-02"
 
   - id: slack-notify
     type: template
@@ -73,6 +117,17 @@ capabilities:
       can: [format_notification, summarize_next_steps, describe_manual_handoff]
       cannot: [send_slack_message, call_slack_api, approve, merge, mark_done]
     risk: low
+    health:
+      checks:
+        - "Notifications summarize the situation, owner need, and next step without claiming delivery."
+        - "Manual handoff language stays distinct from approval, merge, or completion."
+      re_evaluate_when:
+        - "Notification channels or handoff expectations change."
+        - "Slack-notify outputs are mistaken for sent messages or completed work."
+      demotion_criteria:
+        - "The template suggests that it can send messages or call Slack."
+        - "It omits the human action needed to continue the handoff."
+      last_reviewed: "2026-06-02"
 
   - id: repo-validation-check
     type: skill
@@ -100,6 +155,17 @@ capabilities:
       can: [draft_hook_spec, draft_fixtures, draft_install_preview]
       cannot: [install_hook, edit_settings, promote_blocking]
     risk: medium
+    health:
+      checks:
+        - "Drafted hook candidates include a clear trigger, protected scope, and fixture expectations."
+        - "Install previews remain manual-only and do not modify repository settings."
+      re_evaluate_when:
+        - "Repeated violations shift to new paths, tools, or workflows."
+        - "Generated hook candidates are too broad for maintainers to evaluate safely."
+      demotion_criteria:
+        - "The skill installs hooks or edits settings instead of drafting candidates."
+        - "It recommends blocking behavior without human review."
+      last_reviewed: "2026-06-02"
 
   - id: downstream-adapter
     type: template
@@ -113,3 +179,14 @@ capabilities:
       can: [draft_adapter]
       cannot: [mark_adopted_without_approval]
     risk: medium
+    health:
+      checks:
+        - "Draft adapters describe repository boundaries and adoption assumptions explicitly."
+        - "Adapter output avoids marking downstream adoption as approved."
+      re_evaluate_when:
+        - "The adapter schema or example format changes materially."
+        - "Downstream repositories need boundary details not covered by the template."
+      demotion_criteria:
+        - "The template claims adoption approval without a human decision."
+        - "It produces adapters that omit repository-specific boundaries."
+      last_reviewed: "2026-06-02"
