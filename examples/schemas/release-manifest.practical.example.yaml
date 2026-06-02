@@ -1,0 +1,33 @@
+# Example only - does not approve a release or downstream adoption.
+version: v0.1.0
+release_ref: aiwf@example-v0.1.0
+date: 2026-06-02
+status: draft
+
+components:
+  kernel:
+    - id: kernel
+      version: v0.1
+
+  capabilities:
+    - id: source-check
+      type: skill
+      version: v0.1
+    - id: hallucination-check
+      type: skill
+      version: v0.1
+    - id: write-preview
+      type: template
+      version: v0.1
+    - id: task-envelope
+      type: template
+      version: v0.1
+
+changelog:
+  added:
+    - practical example of a small versioned AIWF Core release surface
+  changed: []
+  deprecated: []
+  removed: []
+  migration_notes:
+    - Example only; downstream repositories still need their own draft adapter and explicit human approval.

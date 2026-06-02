@@ -1,0 +1,60 @@
+# Example only - does not authorize worker auto-run or paid execution.
+version: v0.1
+
+defaults:
+  paid_api:
+    allowed: false
+    requires_explicit_approval: true
+  unknown_entitlement:
+    fallback: slack_notify_only
+
+profiles:
+  - id: acme-maintainer
+    role: maintainer
+    workers:
+      claude_code:
+        access: subscribed
+        allowed_modes:
+          - manual_interactive
+          - agent_view
+        auto_run: false
+      codex:
+        access: subscribed
+        allowed_modes:
+          - manual_interactive
+          - exec_bounded
+          - review_worker
+        auto_run: false
+      claude_p:
+        access: not_assumed
+        allowed_modes: []
+        auto_run: false
+    cost_policy:
+      default: subscription_or_plan_limit_only
+      extra_paid_run: explicit_approval_required
+      auto_retry: false
+    fallback:
+      mode: slack_notify_only
+
+  - id: acme-contributor
+    role: contributor
+    workers:
+      claude_code:
+        access: unknown
+        allowed_modes:
+          - manual_if_available
+        auto_run: false
+      codex:
+        access: not_assumed
+        allowed_modes: []
+        auto_run: false
+      claude_p:
+        access: not_assumed
+        allowed_modes: []
+        auto_run: false
+    cost_policy:
+      default: no_extra_paid_run
+      extra_paid_run: forbidden_without_owner_approval
+      auto_retry: false
+    fallback:
+      mode: slack_notify_only
