@@ -190,3 +190,15 @@ capabilities:
         - "The template claims adoption approval without a human decision."
         - "It produces adapters that omit repository-specific boundaries."
       last_reviewed: "2026-06-02"
+  - id: task-assessment
+    type: skill
+    status: candidate
+    version: v0.1
+    trigger:
+      task_classes: [review, compare, shape, transform, write]
+      signals: [non_trivial_task, scope_unclear, before_task_envelope, before_write_preview]
+    location: aiwf/modules/skills/task-assessment/SKILL.md
+    authority_boundary:
+      can: [classify_task, identify_blocking_unknowns, route_next_step]
+      cannot: [approve, write, install, merge, promote]
+    risk: low
