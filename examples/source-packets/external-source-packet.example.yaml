@@ -1,0 +1,75 @@
+# Illustrative filled external-source-packet example
+#
+# Status: INERT / ILLUSTRATIVE / ADVISORY ONLY.
+#
+# This file is a documentation aid that shows the *shape* of a filled-in
+# external source packet, following the template at
+# aiwf/modules/templates/external-source-packet.md. It is fabricated for
+# illustration.
+#
+# This file is NOT:
+#   - dogfood evidence (it is not a record under docs/development/dogfood-runs/
+#     and is not checked by the Dogfood Evidence Gate)
+#   - adoption, approval, registry promotion, or selectability proof
+#   - proof that the recorded source is correct, usable, or endorsed
+#   - a real captured packet
+#
+# A source packet records an external skill source as a SOURCE, NOT a capability.
+# Recording a source here does not make it usable: it is not selectable, not
+# installed, and not copied. It carries no registry entry and no adapter adoption.
+# Promotion past candidate requires the separate external-skill-source lifecycle,
+# a release and registry update, and an explicit human decision.
+#
+# NVIDIA/cuOpt below appears ONLY as an external source example. Nothing is
+# installed, copied, or adopted. Do not run `npx skills add`. Vendor
+# "official" / "verified" wording is a source_claim only, never AIWF approval.
+
+example: true                # illustrative placeholder; not a captured packet
+authority: advisory_only
+is_dogfood_evidence: false
+
+source_id: example-nvidia-cuopt      # illustrative local handle; not a capability id
+lifecycle_stage: source_packet       # recorded as a source; NOT candidate, NOT approved
+
+url: unknown                         # fill with the actual source URL when verified
+author_or_org: NVIDIA                # source claim, not AIWF approval
+source_type: vendor
+captured_at: 2026-06-03              # illustrative date this example packet shape was written
+source_as_of: unknown               # content date not verified in this illustrative example
+license: unknown                    # verify before any use
+terms: unknown                      # verify before any use
+
+risk_surface:
+  supply_chain_risk: unknown
+  tool_permissions: unknown
+  prompt_injection_risk: unknown
+  can_read_secrets: unknown
+  can_call_external_services: unknown
+  can_write: unknown
+
+concept_extraction:
+  facts: []                          # source-backed facts only; none verified in this illustrative example
+  source_claims:
+    - "Vendor describes the skills as official/verified — this is a source_claim, not AIWF approval."
+  inferences:
+    - "If the pack ships executable hooks, a later runtime-inventory pass would be needed (inference, not fact)."
+  unknowns:
+    - "License, terms, and risk surface not yet verified."
+    - "Source content date (source_as_of) not confirmed."
+  possible_aiwf_components: []       # ideas only; not candidates, not selectable
+
+boundaries:
+  not_selectable: true
+  not_installed: true
+  not_copied: true
+  not_adoption: true
+  not_approval: true
+  not_registry_promotion: true
+  not_dogfood_evidence: true
+  not_correctness_proof: true
+  vendor_verification_is_source_claim_not_approval: true
+  promotion_requires_separate_lifecycle_release_registry_and_human: true
+
+human_decision_required:
+  - "Whether to extract any concept from this source at all."
+  - "Whether this source ever advances beyond source_packet."

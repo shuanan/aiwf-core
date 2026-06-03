@@ -1,0 +1,103 @@
+# Illustrative repo-intake output example
+#
+# Status: INERT / ILLUSTRATIVE / ADVISORY ONLY.
+#
+# This file is a documentation aid that shows the *shape* of a draft intake
+# artifact produced by the `repo-intake` candidate skill
+# (aiwf/modules/skills/repo-intake/SKILL.md). It is fabricated for illustration.
+#
+# This file is NOT:
+#   - dogfood evidence (it is not a record under docs/development/dogfood-runs/
+#     and is not checked by the Dogfood Evidence Gate)
+#   - adoption, approval, registry promotion, or selectability proof
+#   - proof that repo-intake is correct, registered, or usable
+#   - a real assessment of any real repository
+#
+# repo-intake is a candidate skill: not approved, not registered, not adopted,
+# not selectable. Its output is advisory input to adoption-assessment only.
+# Every claim below carries an epistemic label:
+#   fact | inference | assumption | unknown | blocker | human_decision_required
+# Inference and unknown are never presented as fact.
+#
+# The values below are illustrative placeholders, not verified observations.
+
+example: true            # illustrative placeholder; not a captured intake
+artifact: repo_intake_draft
+authority: advisory_only
+selectable: false
+is_dogfood_evidence: false
+
+repo_identity:
+  remote:
+    label: fact
+    value: "git@example.invalid:acme/example-service.git"   # illustrative
+  default_branch:
+    label: fact
+    value: main
+  current_head:
+    label: fact
+    value: "0000000000000000000000000000000000000000"        # illustrative placeholder
+  repo_name:
+    label: inference
+    value: "example-service (inferred from remote path)"
+
+repo_structure:
+  top_level_layout:
+    label: fact
+    value:
+      - src/
+      - tests/
+      - .github/workflows/
+      - README.md
+  governance_or_rule_files:
+    label: fact
+    value:
+      - CONTRIBUTING.md
+      - .github/CODEOWNERS
+  build_or_deploy_entrypoints:
+    label: inference
+    value:
+      - ".github/workflows/ci.yml appears to run tests on push"
+
+existing_aiwf_traces:
+  adapter_files:
+    label: fact
+    value: []                       # no aiwf.adapter.yaml found
+  aiwf_residue:
+    label: unknown
+    value: "No obvious AIWF residue found; deeper history not inspected."
+  prior_assessment_artifacts:
+    label: fact
+    value: []
+
+existing_execution_surfaces:        # recorded as observations only; NOT classified or changed here
+  hooks:
+    label: unknown
+    value: ".claude/ not inspected in this illustrative example."
+  ci_entry_points:
+    label: fact
+    value:
+      - ".github/workflows/ci.yml"
+  deploy_entry_points:
+    label: assumption
+    value: "Deploy likely external (illustrative); not verified from source."
+
+blocking_unknowns:
+  - label: blocker
+    value: "License and contribution terms not confirmed from source."
+
+human_decisions_required:
+  - label: human_decision_required
+    value: "Whether to proceed to runtime-inventory / adoption-assessment at all."
+  - label: human_decision_required
+    value: "Whether this repo is in scope for AIWF adoption."
+
+boundaries:
+  not_adoption: true
+  not_approval: true
+  not_registry_promotion: true
+  not_selectable: true
+  not_dogfood_evidence: true
+  not_correctness_proof: true
+  read_only_inspection: true
+  modifies_target_repo: false
