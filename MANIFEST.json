@@ -2,6 +2,7 @@
   "generated_at_utc": "2026-06-01T00:53:06+00:00",
   "repo_name": "aiwf-core",
   "purpose": "Standalone repo scaffold extracted from reusable AIWF logic",
+  "snapshot_status": "Historical/generated snapshot of the AIWF Core v0.1 foundation extraction (see generated_at_utc). Not a live inventory; the repository has grown since. No in-repo generator exists, so this file is not regenerated automatically. For current state, read the repo directly (see docs/development/sync-anchor.md).",
   "files": [
     {
       "path": ".gitignore",
