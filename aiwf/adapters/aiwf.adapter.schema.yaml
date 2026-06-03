@@ -5,6 +5,7 @@ required_fields:
   - version
   - target_repo
   - status
+  - adoption_state
   - source
   - adopted
   - local_boundary
@@ -18,6 +19,19 @@ status_values:
   - evaluated
   - approved
   - deprecated
+
+adoption_state_values:
+  - draft_only
+  - evaluated_not_adopted
+  - approved_adopted
+  - deprecated
+
+field_semantics:
+  status: "Adapter lifecycle state. Only status=approved can be active."
+  adoption_state: "Machine-readable downstream adoption state. Draft and evidence records must not imply repo adoption."
+  adopted: "Selected capability/kernel set declared by this adapter record. This field is not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted."
+  source.adapter_created_at: "Date this adapter record was created. This is not an adoption date."
+  source.last_reviewed_at: "Date this adapter record was last reviewed."
 
 evaluation:
   description: "Optional. Records when and how the adapter was evaluated against repo source."

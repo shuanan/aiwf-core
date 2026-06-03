@@ -1,13 +1,16 @@
 version: v0.1
 target_repo: owner/repo
 status: draft
+adoption_state: draft_only
 
 source:
   aiwf_repo: owner/aiwf-core
   source_ref: aiwf@v0.1.0
-  adopted_at: YYYY-MM-DD
+  adapter_created_at: YYYY-MM-DD
   last_reviewed_at: YYYY-MM-DD
 
+# Selected capability/kernel set for this adapter record.
+# Not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted.
 adopted:
   kernel:
     version: v0.1

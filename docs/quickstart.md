@@ -25,6 +25,9 @@ Keep the first adapter small:
 
 ```yaml
 status: draft
+adoption_state: draft_only
+# adopted: is the selected capability/kernel set for this adapter record.
+# It is not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted.
 adopted:
   kernel:
     version: v0.1

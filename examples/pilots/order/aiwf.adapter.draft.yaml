@@ -4,13 +4,16 @@
 version: v0.1
 target_repo: internal/Order
 status: draft
+adoption_state: draft_only
 
 source:
   aiwf_repo: shuanan/aiwf-core
   source_ref: aiwf@v0.1.0
-  adopted_at: 2026-06-02
+  adapter_created_at: 2026-06-02
   last_reviewed_at: 2026-06-02
 
+# Selected capability/kernel set for this adapter record.
+# Not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted.
 adopted:
   kernel:
     version: v0.1
