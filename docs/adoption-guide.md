@@ -50,8 +50,8 @@ aiwf_core_version: "v0.1.0"      # pin to the release you read
 source:
   aiwf_repo: shuanan/aiwf-core
   source_ref: aiwf@v0.1.0
-  adopted_at: YYYY-MM-DD         # today's date
-  last_reviewed_at: YYYY-MM-DD   # same as adopted_at for first draft
+  adapter_created_at: YYYY-MM-DD  # today's date — when the adapter record was created, not an adoption date
+  last_reviewed_at: YYYY-MM-DD    # same as adapter_created_at for first draft
 ```
 
 ### 4. Set status and enforcement
@@ -60,16 +60,19 @@ Always start here. Do not advance either field until human review:
 
 ```yaml
 status: draft
+adoption_state: draft_only
 enforcement: none
 ```
 
-`draft` signals that this file is an intent declaration, not an active adoption. `enforcement: none` means no rules are being enforced by this file. Both fields must stay at these values until a maintainer explicitly approves advancement.
+`draft` signals that this file is an intent declaration, not an active adoption. `adoption_state: draft_only` is the machine-readable assertion that the downstream repo has not adopted AIWF — it stays `draft_only` until `status` reaches `approved` and a maintainer sets `approved_adopted`. `enforcement: none` means no rules are being enforced by this file. All three fields must stay at these values until a maintainer explicitly approves advancement.
 
 ### 5. Choose kernel rules
 
 Adopt all seven kernel rules. They are minimal, low-risk, and designed to be always-on:
 
 ```yaml
+# Selected capability/kernel set for this adapter record.
+# Not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted.
 adopted:
   kernel:
     version: v0.1
@@ -209,15 +212,18 @@ Copy-paste this minimal block and fill in the bracketed values:
 version: v0.1
 target_repo: [owner/repo]
 status: draft
+adoption_state: draft_only
 enforcement: none
 aiwf_core_version: "v0.1.0"
 
 source:
   aiwf_repo: shuanan/aiwf-core
   source_ref: aiwf@v0.1.0
-  adopted_at: [YYYY-MM-DD]
+  adapter_created_at: [YYYY-MM-DD]
   last_reviewed_at: [YYYY-MM-DD]
 
+# Selected capability/kernel set for this adapter record.
+# Not proof of downstream repo adoption unless status=approved and adoption_state=approved_adopted.
 adopted:
   kernel:
     version: v0.1
