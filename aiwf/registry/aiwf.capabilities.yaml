@@ -202,3 +202,15 @@ capabilities:
       can: [classify_task, identify_blocking_unknowns, route_next_step]
       cannot: [approve, write, install, merge, promote]
     risk: low
+  - id: repo-intake
+    type: skill
+    status: candidate
+    version: v0.1
+    trigger:
+      task_classes: [review, shape]
+      signals: [adoption_assessment_needed, repo_facts_needed, before_adoption_assessment]
+    location: aiwf/modules/skills/repo-intake/SKILL.md
+    authority_boundary:
+      can: [gather_source_facts, label_claims_fact_inference_assumption_unknown, produce_draft_intake_artifact]
+      cannot: [approve, adopt, migrate, promote, mark_selectable, install_hook, edit_settings, modify_target_repo, call_external_services, install_or_copy_vendor_skills, claim_ci_passed, merge]
+    risk: low
