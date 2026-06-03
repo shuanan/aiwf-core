@@ -402,6 +402,62 @@ pr_policy:
     - CI green or accepted exception
 ```
 
+## Bounded-run approval (experiment)
+
+This is an **experiment** to reduce repeated approve / go / review loops for
+low-risk, docs-only aiwf-core lanes. It changes approval **granularity**, not
+safety **boundaries**.
+
+One approved envelope can cover multiple small steps, so a human does not have to
+re-approve each branch, edit, validation, and draft-PR step individually. It is
+meant to reduce process tax. It does **not** let AI self-approve any hard stop:
+merge, release, promotion, selectability, adoption, and runtime/hook/settings
+changes remain explicit human decisions. It is experimental, off by default, and
+can be reverted at any time.
+
+It is **not** a kernel rule, **not** a registry capability, **not** validator
+enforcement, and **not** auto-merge permission.
+
+```yaml
+bounded_run_approval:
+  status: experimental
+  default: off
+  enabled_by: explicit human envelope approval
+  allowed_for:
+    - docs-only cleanup
+    - non-authoritative audit docs
+    - stale-doc cleanup
+    - wording/consistency fixes
+  executor_may:
+    - create branch
+    - edit within approved file/path envelope
+    - run validation
+    - open draft PR
+    - verify CI
+    - mark ready for review if all envelope conditions hold
+  executor_must_stop_on:
+    - files outside envelope
+    - validation failure
+    - CI red
+    - registry status change
+    - promotion/selectability/adoption
+    - release declaration ambiguity
+    - runtime/hooks/settings changes
+    - downstream repo writes
+  still_requires_explicit_human_go:
+    - merge
+    - release tag
+    - promotion
+    - selectability
+    - adapter adoption
+    - runtime configuration
+```
+
+This experiment changes approval granularity, not safety boundaries. One approved
+envelope can cover multiple small steps, but the executor must stop and return to
+the human the moment any `executor_must_stop_on` condition appears, and the
+`still_requires_explicit_human_go` decisions are never self-approved.
+
 ## Executor report format
 
 Local executor should report:
