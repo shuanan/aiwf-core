@@ -1,0 +1,48 @@
+version: v0.1
+schema: aiwf.upgrade_assessment
+status: design_draft
+authority: advisory_only
+
+# Compares a repo's current adapter pin / source_ref / adopted capabilities against
+# newer AIWF Core surfaces and emits findings and recommendations. This schema is
+# UPSTREAM of aiwf/lifecycle/upgrade_plan.schema.yaml: it informs whether an upgrade
+# plan should be drafted, but it does NOT propose an adapter patch and does NOT apply
+# anything. It is advisory only and non-executing.
+
+required_fields:
+  - target_repo
+  - generated_at
+  - current_source_ref     # what the repo currently pins
+  - compared_against       # the newer AIWF Core surface/release being compared
+  - adopted_capabilities   # the repo's currently adopted capability set being assessed
+  - findings               # labeled comparison findings (see finding kinds)
+  - recommendation         # next-step recommendation, not an action
+  - blocking_unknowns
+  - human_decision_required
+
+finding_required_fields:
+  - kind
+  - detail
+  - evidence_label         # fact | inference | assumption | unknown | blocker | human_decision_required
+
+enums:
+  finding_kind:
+    - safe_upgrade
+    - new_approved_capability
+    - candidate_only_item
+    - deprecated_capability
+    - breaking_change
+    - do_not_upgrade_warning
+  recommendation:
+    - no_upgrade_needed
+    - upgrade_plan_possible      # hand off to upgrade_plan schema (separate, human-approved)
+    - review_first
+    - stop
+
+rules:
+  - upstream_of_upgrade_plan          # informs upgrade_plan; does not replace or duplicate it
+  - no_proposed_adapter_patch         # patch belongs to upgrade_plan, not to this assessment
+  - do_not_apply_automatically        # consistent with adapter upgrade_policy
+  - upgrade_requires_human_approval
+  - candidate_only_items_are_not_selectable
+  - preserve_evidence_labels

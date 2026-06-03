@@ -1,0 +1,68 @@
+version: v0.1
+schema: aiwf.runtime_inventory
+status: design_draft
+authority: advisory_only
+
+# Describes existing repo execution surfaces (hooks, skills, settings,
+# CI/deploy entry points) so they can be classified before any migration.
+# This schema is descriptive and advisory only. It does not execute, install,
+# edit, migrate, or take ownership of any surface. It only classifies.
+
+required_fields:
+  - target_repo
+  - generated_at
+  - source_ref
+  - surfaces        # list of inventory items, one per execution surface
+  - blocking_unknowns
+  - human_decision_required
+
+surface_required_fields:
+  - id
+  - kind            # hook | skill | setting | ci_entry | deploy_entry | other | unknown
+  - path
+  - owner
+  - mode
+  - risk_flags
+  - disposition
+  - evidence_label  # fact | inference | assumption | unknown | blocker | human_decision_required
+
+enums:
+  owner:
+    - local_repo
+    - legacy_aiwf
+    - third_party
+    - aiwf_core
+    - unknown
+  mode:
+    - none
+    - log_only
+    - warn
+    - block
+    - write
+    - external_call
+    - unknown
+  disposition:
+    - keep_local
+    - reference_only
+    - audit_before_migration
+    - migrate_candidate
+    - remove_candidate
+    - human_review_required
+
+risk_flags:
+  # Each flag is true | false | unknown. Default to unknown when not verified.
+  - can_block
+  - can_write
+  - can_read_secrets
+  - can_call_external_services
+  - changes_agent_behavior
+  - affects_ci
+  - affects_deploy
+
+rules:
+  - classify_do_not_modify          # inventory classifies surfaces; it never installs, edits, or removes them
+  - local_repo_safety_surfaces_win  # local safety hooks must not be weakened
+  - aiwf_acts_as_auditor_not_owner  # do not silently take ownership of existing hooks/skills
+  - hooks_and_settings_are_high_risk_writes  # any change is a separate human-approved write flow
+  - unverified_owner_or_mode_is_unknown_not_assumed
+  - preserve_evidence_labels        # fact / inference / assumption / unknown / blocker / human_decision_required
