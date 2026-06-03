@@ -1,0 +1,45 @@
+version: v0.1
+schema: aiwf.repo_governance_map
+status: design_draft
+authority: advisory_only
+
+# Classifies a repo's existing local rules before adoption, and surfaces
+# duplicated, conflicting, and missing boundaries. Descriptive and advisory
+# only. It does not rewrite, reconcile, or adopt any rule; it reports findings
+# for a human to decide on.
+
+required_fields:
+  - target_repo
+  - generated_at
+  - source_ref
+  - rule_entries        # list of classified local rules
+  - conflicts           # detected conflicting rules
+  - duplicates          # detected duplicated rules
+  - missing_boundaries  # boundaries expected but absent
+  - blocking_unknowns
+  - human_decision_required
+
+rule_entry_required_fields:
+  - id
+  - source_path
+  - category
+  - evidence_label      # fact | inference | assumption | unknown | blocker | human_decision_required
+
+enums:
+  category:
+    - domain_safety
+    - ai_workflow
+    - production_deploy
+    - secrets_privacy
+    - branch_pr_ci
+    - legacy_aiwf_residue
+    - duplicated
+    - conflicting
+    - missing_boundary
+
+rules:
+  - classify_do_not_resolve         # map reports conflicts/gaps; it does not resolve them
+  - local_boundary_wins             # local repo rules override generic AIWF guidance (kernel K6)
+  - conflicts_and_gaps_are_findings # often blocker or human_decision_required
+  - source_beats_memory             # classify from current source, not prior summaries (kernel K2)
+  - preserve_evidence_labels

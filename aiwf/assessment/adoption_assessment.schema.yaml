@@ -1,0 +1,40 @@
+version: v0.1
+schema: aiwf.adoption_assessment
+status: design_draft
+authority: advisory_only
+
+# Consumes repo-intake + runtime-inventory + repo-governance-map findings and
+# recommends exactly one next-safe-step disposition. Advisory only: a disposition
+# is a recommendation, never an adoption, migration, upgrade, or approval decision.
+
+required_fields:
+  - target_repo
+  - generated_at
+  - source_ref
+  - inputs_considered     # references to intake / runtime_inventory / governance_map evidence
+  - disposition           # exactly one value from the disposition enum
+  - rationale             # labeled findings supporting the disposition
+  - blocking_unknowns
+  - human_decision_required
+
+rationale_entry_required_fields:
+  - statement
+  - evidence_label        # fact | inference | assumption | unknown | blocker | human_decision_required
+
+enums:
+  disposition:
+    - no_adoption
+    - cleanup_first
+    - adapter_draft_possible
+    - already_adopted_needs_review
+    - upgrade_assessment_needed
+    - migration_plan_possible
+    - stop
+
+rules:
+  - recommend_exactly_one_disposition
+  - disposition_is_advisory_not_a_decision   # never an adoption/migration/upgrade decision
+  - blocking_unknowns_force_conditional_or_withheld_recommendation
+  - candidate_reviewed_pilot_external_items_are_not_selectable
+  - do_not_self_approve_adoption               # kernel K1
+  - preserve_evidence_labels
