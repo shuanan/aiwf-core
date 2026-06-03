@@ -45,6 +45,58 @@ label:
 Inference and unknown must never be presented as fact. Blocking unknowns are
 surfaced, not guessed past.
 
+### Existing-adapter diff mode
+
+A target repo may already carry AIWF state (an `aiwf.adapter.yaml`, a prior
+assessment artifact, or a legacy/competing governance adapter). When it does,
+do not re-derive identity and boundaries from scratch only — also compare what
+the source actually shows against what the existing adapter claims, and label
+each mismatch.
+
+```yaml
+existing_adapter_diff_mode:
+  trigger:
+    - aiwf.adapter.yaml exists
+    - prior AIWF assessment exists
+    - legacy governance adapter exists
+  behavior:
+    - do not re-derive from scratch only
+    - compare observed repo facts against existing adapter claims
+    - label mismatches as fact / inference / unknown / blocker
+```
+
+This stays advisory: intake reports the diff, it does not reconcile, update, or
+approve the adapter.
+
+### Output field additions
+
+Record these, read-only and labeled, when the repo provides evidence for them
+(use `unknown` when it does not):
+
+```yaml
+repo_intake_output_additions:
+  consumers_or_downstream_dependents:   # repos/services that depend on this one
+  deploy_method:                        # e.g. scp+systemd, docker-compose, git-based
+  vcs_deployment_divergence:            # deploy target not a git repo / differs from VCS
+  competing_governance_layers:          # >1 adapter or stale legacy governance present
+  production_state_unknowns:            # deployed commit/state unverifiable offline
+  runtime_inventory_boundary:           # what intake records vs. defers (see below)
+```
+
+### Boundary with runtime-inventory
+
+Intake names execution and risk surfaces; it does not perform the deep inventory.
+
+```yaml
+runtime_inventory_boundary:
+  repo_intake:
+    - identify execution surfaces
+    - identify risky runtime/deploy/secret boundaries
+    - stop before deep runtime inventory
+  runtime_inventory:
+    - detailed service/process/scheduler/DB/deploy inventory
+```
+
 ## Must
 
 - Inspect only current source and tool output; prefer source over memory or prior summaries.
