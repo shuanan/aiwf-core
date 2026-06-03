@@ -1,7 +1,7 @@
 version: v0.1.0
 release_ref: aiwf@v0.1.0
-date: 2026-06-01
-status: draft
+date: 2026-06-04
+status: released
 
 components:
   kernel:
@@ -21,12 +21,28 @@ components:
     - id: task-envelope
       type: template
       version: v0.1
+    - id: slack-notify
+      type: template
+      version: v0.1
+    - id: hook-candidate-generator
+      type: skill
+      version: v0.1
+    - id: downstream-adapter
+      type: template
+      version: v0.1
 
 changelog:
   added:
-    - initial AIWF Core skeleton
+    - thin always-loaded execution kernel (K1-K7)
+    - capability registry with approved/candidate status model and authority boundaries
+    - released approved capability set (advisory skills and human-gated templates)
+    - adapter-first downstream adoption contract and example draft adapter
+    - worker entitlement profiles and control-plane adapter contract
+    - lifecycle, release, and upgrade boundaries
+    - local validation script with CI declaration-integrity and dogfood-evidence gates
   changed: []
   deprecated: []
   removed: []
   migration_notes:
-    - new repo extracted from previous AIWF exploration work
+    - first released version; no prior release to migrate from
+    - candidate capabilities are not part of this release and remain non-selectable
