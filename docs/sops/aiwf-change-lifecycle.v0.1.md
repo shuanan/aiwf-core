@@ -169,6 +169,11 @@ write_preview:
 
 Preview is not approval. Human approval must be explicit.
 
+For AI/AIWF artifact persistence decisions — including whether an artifact belongs
+in tracked files, local-only paths, `.git/info/exclude`, or exceptional
+`skip-worktree` handling — consult `docs/sops/ai-artifact-persistence-policy.v0.1.md`
+before preparing the write.
+
 ### 2. Preflight
 
 Before local execution, run:
