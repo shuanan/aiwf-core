@@ -128,6 +128,50 @@ states:
     meaning: intentionally stopped and not expected to continue
 ```
 
+## Proposal artifact lifecycle overlay
+
+Merged proposal docs are tracked artifacts, not adopted rules.
+
+```yaml
+proposal_doc_states:
+  proposed:
+    meaning: merged or unmerged proposal exists; advisory only
+
+  pilot_requested:
+    meaning: human explicitly instructs this session/lane to apply the proposal as pilot guidance
+
+  pilot_in_progress:
+    meaning: proposal is being session-applied inside an approved envelope
+
+  evidence_captured:
+    meaning: pilot produced source-backed evidence
+
+  evaluation_pending:
+    meaning: human has not decided adopt / revise / park / reject
+
+  adopted:
+    meaning: explicit human adoption decision plus required registry/kernel/SOP/release changes, if any
+
+  revised:
+    meaning: proposal needs a new version before further use
+
+  parked:
+    meaning: retained for reference, not active guidance
+
+  rejected:
+    meaning: should not be used as guidance
+```
+
+Rules:
+
+* Merged proposal does not mean adoption.
+* Proposed docs may be piloted only by explicit human instruction.
+* Pilot use is session-applied guidance, not repo adoption.
+* Pilot use does not update kernel, registry, schema, release, hooks, settings, or downstream adapters.
+* Pilot evidence must be captured before evaluation.
+* Evidence leads to adopt, revise, park, reject, or continue pilot.
+* Adoption requires explicit human approval and the normal lifecycle path.
+
 ## Default workflow
 
 ### 0. Intake
@@ -377,6 +421,31 @@ action:
   - report unchanged state
 ```
 
+### Process anomaly / lifecycle gap
+
+Repeated correction is evidence, not noise.
+
+Stop local answering and surface a workflow gap when:
+
+* the same correction repeats
+* the human becomes a relay for executor prompts
+* micro-approval loops multiply inside one intended task
+* a merged proposal has no next lifecycle state
+* a tool or candidate is discussed without pilot evidence
+* local micro-fixes are replacing workflow diagnosis
+
+Output:
+
+```yaml
+process_anomaly:
+  trigger:
+  evidence:
+  affected_lifecycle:
+  local_fix_to_pause:
+  recommended_smallest_sop_patch:
+  human_decision_required:
+```
+
 ## PR policy
 
 ```yaml
@@ -463,6 +532,28 @@ envelope can cover multiple small steps, but the executor must stop and return t
 the human the moment any `executor_must_stop_on` condition appears, and the
 `still_requires_explicit_human_go` decisions are never self-approved.
 
+### Envelope-level approval clarification
+
+Approval is for a bounded envelope, not every micro-step.
+
+An approved envelope may cover low-risk internal steps such as read-only inspection,
+bounded edits, validation, draft PR creation, and review packet preparation when
+the preview names target, operation, risk, reversibility, no-touch boundaries,
+stop conditions, and done criteria.
+
+This changes approval granularity, not safety boundaries.
+
+The executor must stop on:
+
+* scope or architecture change
+* files outside envelope
+* dirty or mismatched repo state
+* source contradiction
+* repeated correction indicating workflow confusion
+* proposal/tool has no next lifecycle state
+* registry/kernel/schema/runtime/hooks/settings/downstream change
+* adoption, promotion, release, merge, deploy, or selectability decision
+
 ## Executor report format
 
 Local executor should report:
@@ -487,6 +578,27 @@ executor_report:
   source_contradictions:
   deviations_from_plan:
   next_smallest_safe_action:
+```
+
+For proposal or pilot lanes, also report:
+
+```yaml
+pilot_evidence:
+  proposal:
+  pilot_scope:
+  explicit_pilot_instruction:
+  session_applied_only: true
+  evidence:
+    useful_catches: []
+    missed_cases: []
+    friction: []
+    false_positives: []
+    repeated_corrections: []
+    process_anomalies: []
+  outcome:
+    recommendation: adopt | revise | park | reject | continue_pilot
+    rationale:
+    human_decision_required: true
 ```
 
 ## Review report format
@@ -542,3 +654,7 @@ A change following this SOP is not done until:
 * source contradictions surfaced
 * deviations from plan reported
 * human-only decisions remain human-only
+* proposal docs are not treated as adopted merely because they merged
+* pilot use, if any, is labeled session-applied only
+* pilot evidence is captured before any adopt / revise / park / reject recommendation
+* process anomalies are surfaced as evidence when they affect the workflow
