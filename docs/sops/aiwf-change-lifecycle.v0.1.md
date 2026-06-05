@@ -441,10 +441,18 @@ process_anomaly:
   trigger:
   evidence:
   affected_lifecycle:
-  local_fix_to_pause:
-  recommended_smallest_sop_patch:
+  immediate_action: pause_local_fix_and_diagnose
+  likely_layer: existing_rule_not_followed | workflow_usage_gap | task_split_error | tool_limit | approval_envelope_gap | actual_rule_gap | unknown
+  existing_rules_checked: []
+  diagnosis:
+  possible_next_action: adjust_execution | clarify_envelope | collect_more_evidence | propose_rule_patch | human_decision
   human_decision_required:
 ```
+
+A process anomaly triggers diagnosis first, not immediate rule-making. A SOP patch
+is only one possible outcome after checking whether the issue came from execution
+drift, task splitting, tool limits, approval-envelope design, or an actual rule
+gap.
 
 ## PR policy
 
