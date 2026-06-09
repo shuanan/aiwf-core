@@ -20,7 +20,7 @@ scripts/validate-aiwf-core.sh
 - Forbidden default runtime surfaces are absent.
 - `.claude/settings.json` is not present.
 - Runtime hooks are not installed by default.
-- YAML files parse when PyYAML is available.
+- YAML files parse (PyYAML required; validator hard-fails without it).
 - Capability registry `location` paths exist.
 - Approved capabilities have `authority_boundary.can` and `authority_boundary.cannot`.
 - Release manifest capability IDs exist in the registry.
@@ -88,17 +88,19 @@ The gate must not promote a skill. Promotion remains a human decision.
 - It does not call Claude, Codex, Slack, Linear, Notion, or Langfuse.
 - It does not prove that any prompt, skill, or schema is correct.
 
-## Optional dependency
+## Required dependency (PyYAML)
 
-YAML parse and internal reference validation use Python `PyYAML` when available.
-
-Install locally only if desired:
+The core YAML gates (parse, internal reference, example-adapter, declaration
+integrity) require Python `PyYAML`. Install it before running the validator:
 
 ```bash
 python3 -m pip install pyyaml
 ```
 
-If PyYAML is not installed, YAML parse and internal reference checks are skipped and reported as `SKIP`.
+If PyYAML is not installed the validator hard-fails (exit 1) rather than skipping the
+core gates. For a quick local run of the non-YAML checks only, set
+`AIWF_ALLOW_NO_PYYAML=1` to bypass — this is ignored when `CI=true`, so CI always
+enforces PyYAML.
 
 ## Expected use
 
