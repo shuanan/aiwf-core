@@ -91,7 +91,7 @@ The gate must not promote a skill. Promotion remains a human decision.
 ## Required dependency (PyYAML)
 
 The core YAML gates (parse, internal reference, example-adapter, declaration
-integrity) require Python `PyYAML`. Install it before running the validator:
+integrity, dogfood evidence) require Python `PyYAML`. Install it before running the validator:
 
 ```bash
 python3 -m pip install pyyaml
