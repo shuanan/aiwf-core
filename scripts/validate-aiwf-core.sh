@@ -90,6 +90,16 @@ then
   PYTHON_YAML_AVAILABLE=1
 else
   PYTHON_YAML_AVAILABLE=0
+  # PyYAML missing: the core YAML gates below would skip() and the run would print a
+  # false "passed" (FAIL stays 0 -> exit 0). Hard-fail instead. A local-only escape
+  # hatch (AIWF_ALLOW_NO_PYYAML=1) bypasses for quick non-YAML checks, but is ignored
+  # when CI=true so CI always enforces PyYAML. (CI enforcement relies on CI=true, which
+  # GitHub Actions -- this repo's CI -- always sets.)
+  if [[ "${CI:-}" == "true" || "${AIWF_ALLOW_NO_PYYAML:-}" != "1" ]]; then
+    fail "Python3/PyYAML unavailable; core YAML gates cannot run (install pyyaml, or set AIWF_ALLOW_NO_PYYAML=1 to bypass locally; ignored in CI)"
+    printf '\nvalidate-aiwf-core: %s passed, %s failed, %s skipped\n' "$PASS" "$FAIL" "$SKIP"
+    exit 1
+  fi
 fi
 
 if find . -path './.git' -prune -o -name '*.yaml' -print | grep -q .; then
